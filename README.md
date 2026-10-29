@@ -9,7 +9,7 @@ with no framework and no background process.
 Keep the code in one fixed place that you won't move, e.g. a clone of the private repo:
 
 ```
-git clone https://github.com/<you>/homepate.git %USERPROFILE%\homepate
+git clone https://github.com/sushanthg1711/startpage.git %USERPROFILE%\startpage
 ```
 
 1. Open `chrome://extensions`, `edge://extensions` or `brave://extensions`.
