@@ -5,7 +5,7 @@ const KEY = 'hp.config';
 
 export const DEFAULTS = {
   user: 'susha',
-  host: 'homepate',
+  host: 'startpage',
   searchKey: 'g',            // shortcut used when the input matches nothing else
   seconds: false,            // show seconds on the clock
   grabFocus: false,          // take focus from the address bar (shows the extension url there)
@@ -64,7 +64,11 @@ function merge(base, over) {
 }
 
 export function loadConfig() {
-  try { return merge(DEFAULTS, JSON.parse(localStorage.getItem(KEY)) || {}); }
+  try {
+    const cfg = merge(DEFAULTS, JSON.parse(localStorage.getItem(KEY)) || {});
+    if (cfg.host === 'homepate') cfg.host = DEFAULTS.host;   // the project's old name
+    return cfg;
+  }
   catch { return structuredClone(DEFAULTS); }
 }
 

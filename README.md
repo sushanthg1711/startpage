@@ -1,4 +1,4 @@
-# homepate
+# startpage
 
 A quiet new-tab page for Chrome, Edge and Brave: a 24-hour clock, a quote, soft
 wallpapers, a command palette and a small file terminal. Plain HTML/CSS/JS,

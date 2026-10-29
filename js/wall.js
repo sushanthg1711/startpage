@@ -173,7 +173,7 @@ const SOURCES = {
     return {
       id: 'us:' + p.id,
       img: `${p.urls.raw}&w=${target().w}&q=82&fm=jpg&fit=max`,
-      page: `${p.links.html}?utm_source=homepate&utm_medium=referral`,
+      page: `${p.links.html}?utm_source=startpage&utm_medium=referral`,
       credit: p.user?.name || 'unsplash',
     };
   },
@@ -232,7 +232,7 @@ async function fetchOne() {
         await db.set('kv', 'seen', seen.slice(-SEEN_MAX));
         return { id: meta.id, page: meta.page, credit: meta.credit, blob, tint, source: name };
       } catch (err) {
-        console.warn('[homepate] wallpaper', name, err);
+        console.warn('[startpage] wallpaper', name, err);
         if (err.name === 'AbortError' || err instanceof TypeError) {
           down[name] = Date.now() + DOWN_FOR;
           await db.set('kv', 'down', down);

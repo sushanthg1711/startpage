@@ -81,7 +81,7 @@ function entryHtml(name, kind, abs) {
 }
 
 function greet() {
-  print(`<span class="t-dim">homepate shell — type</span> help <span class="t-dim">for commands. esc closes.</span>`);
+  print(`<span class="t-dim">startpage shell — type</span> help <span class="t-dim">for commands. esc closes.</span>`);
   if (places.length) print(`<span class="t-dim">places:</span> ${places.map((p) => entryHtml(p.name, 'directory', '~/' + p.name)).join('  ')}`);
   else print(`<span class="t-dim">no places yet — run</span> <span class="t-ok">mount</span> <span class="t-dim">and pick a folder (Desktop, MTech, …).</span>`);
 }
