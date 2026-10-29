@@ -70,7 +70,12 @@ It is read-only and runs inside the browser sandbox, so it cannot launch program
 
 Images are downloaded in the background, cropped to your screen, softened once
 (desaturated and dimmed, baked into the pixels) and cached. Each new tab only
-loads a small local JPEG.
+loads one local JPEG, sized to the screen it's on (up to 4K), so a 1080p laptop
+holds about 8 MB of image in memory and a 4K monitor about 33 MB. Images cached for a smaller
+screen are skipped when you move to a bigger one.
+
+Settings → wallpaper has a status line that says which source the current image came from, its
+size, and why a source is being skipped (no Unsplash key, Wallhaven unreachable, …).
 
 Hover the **bottom-right corner** for `like` / `dislike` / `next`.
 - **like**: saved locally; liked wallpapers come back in a share of new tabs (*liked share* in settings).

@@ -1,5 +1,5 @@
 import { DEFAULTS, saveConfig, loadConfig } from './config.js';
-import { flushQueue, listLiked, removeLiked, nextWall } from './wall.js';
+import { flushQueue, listLiked, removeLiked, nextWall, wallStatus } from './wall.js';
 import * as db from './db.js';
 import { esc, toast, applyLook } from './ui.js';
 import { TOPICS, pickable } from './quotes.js';
@@ -20,6 +20,7 @@ export function openSettingsPanel(config, onSaved) {
   renderPlaces();
   renderLiked();
   countQuotes();
+  wallStatus(cfg).then((s) => { el.querySelector('#wall-status').textContent = s; });
   el.querySelector('textarea, input').focus();
 }
 
@@ -75,6 +76,7 @@ function template() {
   <div class="btns"><input type="text" id="place-name" placeholder="name (optional)" style="flex:1"><button class="btn primary" data-act="mount">add folder…</button></div>
 
   <h3>wallpaper</h3>
+  <p class="note" id="wall-status"></p>
   <div class="row"><label>source</label><select data-k="wall.source">
     ${opt('auto', W().source, 'auto (unsplash → wallhaven → picsum)')}${opt('unsplash', W().source)}${opt('wallhaven', W().source)}
     ${opt('picsum', W().source)}${opt('custom', W().source, 'custom url list')}${opt('none', W().source, 'none (plain)')}</select></div>
@@ -84,7 +86,8 @@ function template() {
   <div class="row"><label>softening</label><input type="range" min="0" max="100" step="5" data-k="wall.mood" value="${W().mood}"><span class="val">${W().mood}</span></div>
   <p class="note">softening desaturates & dims new images (baked in once, so it costs no RAM).</p>
   <div class="row"><label>unsplash access key</label><input type="password" data-k="wall.unsplashKey" value="${esc(W().unsplashKey)}" placeholder="optional, free"></div>
-  <p class="note">best quality: create a free app at unsplash.com/developers and paste its access key.</p>
+  <p class="note">best quality, and it follows your search themes: at unsplash.com/developers register, click
+  <b>new application</b>, then copy its <b>access key</b> here. Free; 50 wallpapers an hour is plenty.</p>
   <p class="note">search themes (one per line, picked at random):</p>
   <textarea data-k="wall.queries" rows="6">${esc(W().queries)}</textarea>
   <p class="note">custom image urls (one per line, used when source = custom):</p>

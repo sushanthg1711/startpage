@@ -7,7 +7,7 @@ import { $, idle, toast, setWallTint } from './ui.js';
 
 const QUEUE_SIZE = 2;
 const SEEN_MAX = 5000;
-const DOWN_FOR = 6 * 3600e3;               // skip an unreachable source for 6 h
+const DOWN_FOR = 24 * 3600e3;              // skip an unreachable source for a day
 const SOFT_COLORS = ['424153', '999999', '336600', '666600', '66cccc']; // wallhaven palette
 
 let cfg;
@@ -79,8 +79,10 @@ async function advance() {
       return e;
     }
     const queue = (await db.get('kv', 'queue')) || [];
-    const e = queue.shift();
-    if (!e) return null;
+    // drop images made for a smaller screen (e.g. after moving to a bigger monitor)
+    let e;
+    do e = queue.shift(); while (e?.w && e.w < target().w * 0.75);
+    if (!e) { await db.set('kv', 'queue', queue); return null; }
     await db.set('kv', 'queue', queue);
     await setCurrent(e);
     return e;
@@ -145,6 +147,19 @@ export async function flushQueue(config) {
   idle(refill);
 }
 
+// One line for settings: where the current wallpaper came from, and why a source is skipped.
+export async function wallStatus(config) {
+  const c = config.wall, cur = await db.get('kv', 'current'), down = (await db.get('kv', 'down')) || {};
+  const out = [];
+  if (cur) out.push(`now showing: ${cur.source || '?'} · ${cur.credit || ''}${cur.w ? ` · ${cur.w}px wide` : ''}`);
+  out.push(`this screen needs ${target().w}px`);
+  if (!c.unsplashKey && ['auto', 'unsplash'].includes(c.source)) out.push('unsplash skipped: no access key');
+  for (const [name, until] of Object.entries(down)) {
+    if (until > Date.now()) out.push(`${name} unreachable, retrying in ${Math.ceil((until - Date.now()) / 3600e3)} h`);
+  }
+  return out.join(' · ');
+}
+
 function bindButtons() {
   $('#wall-like').onclick = toggleLike;
   $('#wall-dislike').onclick = dislikeWall;
@@ -184,8 +199,8 @@ const SOURCES = {
   async wallhaven() {
     const q = encodeURIComponent(pick(lines(cfg.queries)) || 'minimalism');
     const base = `https://wallhaven.cc/api/v1/search?q=${q}&categories=100&purity=100&ratios=16x9,16x10&atleast=1920x1080&sorting=random`;
-    let data = (await (await timed(`${base}&colors=${pick(SOFT_COLORS)}`)).json()).data;
-    if (!data?.length) data = (await (await timed(base)).json()).data;
+    let data = (await (await timed(`${base}&colors=${pick(SOFT_COLORS)}`, {}, 6000)).json()).data;
+    if (!data?.length) data = (await (await timed(base, {}, 6000)).json()).data;
     const seen = new Set((await db.get('kv', 'seen')) || []);
     const w = data?.find((d) => !seen.has('wh:' + d.id));
     return w && { id: 'wh:' + w.id, img: w.path, page: w.url, credit: 'wallhaven' };
@@ -230,10 +245,10 @@ async function fetchOne() {
         if (!meta) break;
         if (name !== 'custom' && seen.includes(meta.id)) continue;
         const raw = meta.blob || (await (await timed(meta.img, {}, 45000)).blob());
-        const { blob, tint } = await soften(raw);
+        const { blob, tint, w } = await soften(raw);
         seen.push(meta.id);
         await db.set('kv', 'seen', seen.slice(-SEEN_MAX));
-        return { id: meta.id, page: meta.page, credit: meta.credit, blob, tint, source: name };
+        return { id: meta.id, page: meta.page, credit: meta.credit, blob, tint, w, source: name };
       } catch (err) {
         console.warn('[startpage] wallpaper', name, err);
         if (err.name === 'AbortError' || err instanceof TypeError) {
@@ -251,7 +266,7 @@ async function fetchOne() {
 
 function target() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const w = Math.min(2560, Math.round(screen.width * dpr));
+  const w = Math.min(3840, Math.round(screen.width * dpr));   // up to 4K, never more than this screen needs
   return { w, h: Math.round((w * screen.height) / screen.width) };
 }
 
@@ -273,7 +288,7 @@ async function soften(raw) {
   px.drawImage(canvas, 0, 0, 1, 1);
   const [r, g, b] = px.getImageData(0, 0, 1, 1).data;
 
-  return { blob: await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.86 }), tint: `rgb(${r},${g},${b})` };
+  return { blob: await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.86 }), tint: `rgb(${r},${g},${b})`, w };
 }
 
 // Mean colour of the middle of the image, where the clock sits; it decides the
