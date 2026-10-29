@@ -20,3 +20,18 @@ export function go(url, newTab = false) {
   if (newTab) window.open(url, '_blank', 'noopener');
   else location.href = url;
 }
+
+// Clock position and the boxes behind home-screen text (settings → layout).
+export function applyLook(l) {
+  const s = document.documentElement.style;
+  s.setProperty('--clock-shift', `${l.clockShift}vh`);
+  s.setProperty('--box-alpha', l.boxOpacity / 100);
+  s.setProperty('--box-radius', `${l.boxRadius}px`);
+  s.setProperty('--box-blur', `${l.boxBlur}px`);
+  const box = (sel, on) => $(sel).classList.toggle('boxed', on);
+  box('#clock', l.box === 'single');
+  box('#time', l.box === 'separate');
+  box('#date', l.box === 'separate');
+  box('#quote', l.boxQuote);
+  box('#links', l.boxLinks);
+}

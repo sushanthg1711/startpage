@@ -1,7 +1,7 @@
 import { DEFAULTS, saveConfig, loadConfig } from './config.js';
 import { flushQueue, listLiked, removeLiked, nextWall } from './wall.js';
 import * as db from './db.js';
-import { esc, toast } from './ui.js';
+import { esc, toast, applyLook } from './ui.js';
 import { TOPICS, pickable } from './quotes.js';
 
 let el, cfg, onSave, saveTimer, wallDirty = false;
@@ -15,7 +15,7 @@ export function openSettingsPanel(config, onSaved) {
   el.tabIndex = -1;          // clicks inside keep focus here, so Esc always works
   el.innerHTML = template();
   document.body.append(el);
-  document.body.classList.add('overlay');
+  document.body.classList.add('overlay', 'settings-open');
   bind();
   renderPlaces();
   renderLiked();
@@ -27,10 +27,11 @@ function close() {
   flush();
   el.remove();
   el = null;
-  document.body.classList.remove('overlay');
+  document.body.classList.remove('overlay', 'settings-open');
 }
 
 const W = () => cfg.wall;
+const L = () => cfg.look;
 
 function template() {
   const opt = (v, cur, label = v) => `<option value="${v}" ${v === cur ? 'selected' : ''}>${label}</option>`;
@@ -46,6 +47,17 @@ function template() {
   <div class="row"><label>grab focus</label><input type="checkbox" data-k="grabFocus" ${cfg.grabFocus ? 'checked' : ''}></div>
   <p class="note">off: the address bar stays empty and focused, so you can type a search there; click the page (or press esc then tab) for the palette.
   on: tab opens the palette at once, but the address bar shows the extension's url.</p>
+
+  <h3>layout</h3>
+  <p class="note">the page stays visible on the left while you adjust these.</p>
+  <div class="row"><label>clock height</label><input type="range" min="-20" max="20" step="1" data-k="look.clockShift" data-unit="vh" value="${L().clockShift}"><span class="val">${L().clockShift}vh</span></div>
+  <div class="row"><label>clock box</label><select data-k="look.box">
+    ${opt('none', L().box)}${opt('single', L().box, 'one box for clock + date')}${opt('separate', L().box, 'separate boxes')}</select></div>
+  <div class="row"><label>box opacity</label><input type="range" min="0" max="100" step="5" data-k="look.boxOpacity" data-unit="%" value="${L().boxOpacity}"><span class="val">${L().boxOpacity}%</span></div>
+  <div class="row"><label>corner rounding</label><input type="range" min="0" max="48" step="2" data-k="look.boxRadius" data-unit="px" value="${L().boxRadius}"><span class="val">${L().boxRadius}px</span></div>
+  <div class="row"><label>background blur</label><input type="range" min="0" max="30" step="2" data-k="look.boxBlur" data-unit="px" value="${L().boxBlur}"><span class="val">${L().boxBlur}px</span></div>
+  <div class="row"><label>box the quote</label><input type="checkbox" data-k="look.boxQuote" ${L().boxQuote ? 'checked' : ''}></div>
+  <div class="row"><label>box the links</label><input type="checkbox" data-k="look.boxLinks" ${L().boxLinks ? 'checked' : ''}></div>
 
   <h3>shortcuts</h3>
   <p class="note">key | name | home url | search url. In the palette: <b>g</b>↵ opens google, <b>g cats</b>↵ searches it.</p>
@@ -65,7 +77,7 @@ function template() {
     ${opt('picsum', W().source)}${opt('custom', W().source, 'custom url list')}${opt('none', W().source, 'none (plain)')}</select></div>
   <div class="row"><label>change</label><select data-k="wall.refresh">
     ${opt('tab', W().refresh, 'every new tab')}${opt('hour', W().refresh, 'every hour')}${opt('day', W().refresh, 'once a day')}</select></div>
-  <div class="row"><label>liked share</label><input type="range" min="0" max="100" step="5" data-k="wall.likedShare" value="${W().likedShare}"><span class="val">${W().likedShare}%</span></div>
+  <div class="row"><label>liked share</label><input type="range" min="0" max="100" step="5" data-k="wall.likedShare" data-unit="%" value="${W().likedShare}"><span class="val">${W().likedShare}%</span></div>
   <div class="row"><label>softening</label><input type="range" min="0" max="100" step="5" data-k="wall.mood" value="${W().mood}"><span class="val">${W().mood}</span></div>
   <p class="note">softening desaturates & dims new images (baked in once, so it costs no RAM).</p>
   <div class="row"><label>unsplash access key</label><input type="password" data-k="wall.unsplashKey" value="${esc(W().unsplashKey)}" placeholder="optional, free"></div>
@@ -110,7 +122,8 @@ function bind() {
     const t = e.target;
     const v = t.type === 'checkbox' ? t.checked : t.type === 'range' ? +t.value : t.value;
     setPath(k, v);
-    if (t.type === 'range') t.nextElementSibling.textContent = k === 'wall.likedShare' ? `${v}%` : v;
+    if (t.type === 'range') t.nextElementSibling.textContent = v + (t.dataset.unit || '');
+    if (k.startsWith('look.')) applyLook(cfg.look);
     if (k.startsWith('wall.') && k !== 'wall.likedShare' && k !== 'wall.refresh') wallDirty = true;
     if (k.startsWith('quotes.')) countQuotes();
     scheduleSave();

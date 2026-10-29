@@ -46,6 +46,15 @@ minimal desert
 still lake`,
     custom: '',
   },
+  look: {
+    clockShift: -6,          // vh; negative moves the clock and date up
+    box: 'single',           // none | single (clock + date together) | separate
+    boxOpacity: 30,          // 0–100
+    boxRadius: 18,           // px
+    boxBlur: 12,             // px of frosted-glass blur behind the box
+    boxQuote: false,
+    boxLinks: false,
+  },
   quotes: {
     builtin: true,
     topics: [],              // e.g. ['philosophy', 'abstract']; empty = everything

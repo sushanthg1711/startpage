@@ -69,6 +69,9 @@ body.overlay #veil::after { opacity: 1; }
   transition: opacity .25s ease, filter .25s ease;
 }
 body.overlay #home { opacity: 0; }
+/* settings: keep the page visible beside the drawer, for live preview */
+body.settings-open #home { opacity: 1; right: min(520px, 100vw); }
+body.settings-open #veil::after { opacity: .35; }
 
 #quote { margin: 0; max-width: 62ch; text-align: center; opacity: 0; transition: opacity .8s ease .1s; }
 #quote.ready { opacity: 1; }
@@ -83,7 +86,11 @@ body.overlay #home { opacity: 0; }
 }
 #quote-author::before { content: '— '; color: var(--sage); }
 
-#clock { align-self: center; text-align: center; user-select: none; }
+#clock {
+  align-self: center; text-align: center; user-select: none;
+  display: flex; flex-direction: column; align-items: center;
+  transform: translateY(var(--clock-shift, -6vh));
+}
 #time {
   display: block; font-family: var(--serif); font-weight: 300;
   font-size: clamp(88px, 13vw, 190px); line-height: .9; letter-spacing: .01em;
@@ -97,6 +104,20 @@ body.overlay #home { opacity: 0; }
 }
 #date .dot { color: var(--sage); margin: 0 .55em; }
 #date .meta { color: var(--fg-faint); }
+
+/* optional frosted boxes (settings → layout) */
+.boxed {
+  background: rgba(16, 19, 21, var(--box-alpha, .3));
+  border: 1px solid var(--line);
+  border-radius: var(--box-radius, 18px);
+  -webkit-backdrop-filter: blur(var(--box-blur, 12px));
+  backdrop-filter: blur(var(--box-blur, 12px));
+}
+#clock.boxed { padding: 30px 56px 32px; }
+#time.boxed { padding: 14px 44px 22px; }
+#date.boxed { margin-top: 14px; padding: 10px 22px 10px calc(22px + .22em); }
+#quote.boxed { padding: 18px 30px 20px; }
+#links.boxed { padding: 6px 20px; }
 
 #links { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 0; max-width: 90vw; }
 #links a {
@@ -201,7 +222,7 @@ kbd { font-family: var(--mono); color: var(--fg-dim); border-bottom: 1px solid v
 #settings .row { display: flex; gap: 12px; align-items: center; margin: 8px 0; }
 #settings .row label { flex: 0 0 150px; color: var(--fg-dim); }
 #settings .row input[type=range] { flex: 1; accent-color: var(--sage); }
-#settings .row .val { width: 4ch; text-align: right; color: var(--fg-faint); }
+#settings .row .val { width: 5ch; text-align: right; color: var(--fg-faint); }
 #settings .btn {
   background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 4px;
   padding: 6px 12px; cursor: pointer; font-size: 11.5px; letter-spacing: .06em;

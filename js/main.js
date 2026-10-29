@@ -1,7 +1,7 @@
 import { loadConfig, parseShortcuts, parseLinks } from './config.js';
 import { pickable } from './quotes.js';
 import { initWall, nextWall, toggleLike } from './wall.js';
-import { $, esc, go, toast } from './ui.js';
+import { $, esc, go, toast, applyLook } from './ui.js';
 import { calc } from './calc.js';
 
 let cfg = loadConfig();
@@ -181,7 +181,7 @@ async function openSettings() {
     cfg = next;
     shortcuts = parseShortcuts(cfg.shortcuts);
     links = parseLinks(cfg.links);
-    renderLinks(); tick();
+    renderLinks(); tick(); applyLook(cfg.look);
   });
 }
 $('#open-settings').onclick = openSettings;
@@ -201,6 +201,7 @@ document.addEventListener('keydown', (e) => {
 /* ── go ──────────────────────────────────────────────── */
 
 if (!window.hpRedirecting) {   // see boot.js
+  applyLook(cfg.look);
   tick();
   showQuote();
   renderLinks();
