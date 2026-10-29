@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>new tab</title>
+  <script src="js/boot.js"></script>
+  <link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <div id="wall" aria-hidden="true"></div>
+  <div id="veil" aria-hidden="true"></div>
+
+  <main id="home">
+    <figure id="quote">
+      <blockquote id="quote-text"></blockquote>
+      <figcaption id="quote-author"></figcaption>
+    </figure>
+
+    <section id="clock">
+      <time id="time"></time>
+      <div id="date"></div>
+    </section>
+
+    <nav id="links"></nav>
+  </main>
+
+  <div class="corner left">
+    <div class="corner-inner">
+      <span class="hint"><kbd>tab</kbd> search</span>
+      <span class="hint"><kbd>ctrl</kbd>+<kbd>`</kbd> terminal</span>
+      <button id="open-settings" title="settings">settings</button>
+    </div>
+  </div>
+
+  <div class="corner right">
+    <div class="corner-inner">
+      <a id="wall-credit" target="_blank" rel="noopener" title="wallpaper source"></a>
+      <button id="wall-like" title="like — keep in rotation">like</button>
+      <button id="wall-dislike" title="dislike — never show again">dislike</button>
+      <button id="wall-next" title="next wallpaper">next</button>
+    </div>
+  </div>
+
+  <div id="palette" hidden>
+    <div class="palette-box">
+      <div class="palette-row">
+        <span class="caret">›</span>
+        <input id="palette-input" autocomplete="off" spellcheck="false" placeholder="g cats, y lofi, 2*pi, arxiv.org …">
+      </div>
+      <div id="palette-preview"></div>
+      <ul id="palette-list"></ul>
+    </div>
+  </div>
+
+  <div id="toast" role="status"></div>
+</body>
+</html>

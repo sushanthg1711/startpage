@@ -1,0 +1,5 @@
+*.pem
+*.crx
+.DS_Store
+Thumbs.db
+homepate-settings*.json
