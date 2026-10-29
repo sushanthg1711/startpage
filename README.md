@@ -98,11 +98,22 @@ so you can watch each change as you make it.
 | --- | --- |
 | clock height | moves the clock and date up (negative) or down, in % of the screen height |
 | clock box | one box around clock + date, a separate box for each, or none |
-| box colour | *calm tint from wallpaper*: the wallpaper's hue, desaturated and kept dark. *neutral dark*: always the same grey |
+| box colour | taken from the middle of the wallpaper, always muted. See below |
 | box opacity | how solid the box is |
 | corner rounding | 0 for square corners, 48 for a pill shape |
 | background blur | frosted-glass blur behind the box |
 | box the quote / links | gives the quote and the bottom links a box too, which helps on bright wallpapers |
+
+**Box colour** options:
+- **calm dark tint**: the wallpaper's hue, kept dark. Light text, always.
+- **match**: light box on a bright wallpaper, dark box on a dark one.
+- **invert**: the opposite, dark on bright and light on dark, and with the opposite hue, so a warm
+  sunset gets a cool box and a deep blue sea gets a warm cream one.
+- **neutral dark**: the same grey whatever the wallpaper.
+
+A light box switches its text to dark ink, and is a little more solid so the text stays readable.
+
+![The three wallpaper-based box colours on a bright sunset and a dark underwater photo](docs/screenshots/box-colours.jpg)
 
 | separate boxes, quote and links boxed | no boxes |
 | --- | --- |

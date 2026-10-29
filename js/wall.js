@@ -3,7 +3,7 @@
 // IndexedDB. A new tab only ever decodes one screen-sized local JPEG.
 
 import * as db from './db.js';
-import { $, idle, toast } from './ui.js';
+import { $, idle, toast, setWallTint } from './ui.js';
 
 const QUEUE_SIZE = 2;
 const SEEN_MAX = 5000;
@@ -45,11 +45,10 @@ async function show(entry) {
   if (shownUrl) URL.revokeObjectURL(shownUrl);
   shownUrl = url;
 
-  if (entry.tint) {
-    const box = calmTint(entry.tint);
-    document.documentElement.style.setProperty('--box-wall', box);
-    try { localStorage.setItem('hp.tint', entry.tint); localStorage.setItem('hp.box', box); } catch {}
-  }
+  if (entry.tint) try { localStorage.setItem('hp.tint', entry.tint); } catch {}
+  const centre = centreTint(img);
+  try { localStorage.setItem('hp.ctint', centre); } catch {}
+  setWallTint(centre);
   const credit = $('#wall-credit');
   credit.textContent = entry.credit || '';
   credit.href = entry.page || '#';
@@ -277,18 +276,16 @@ async function soften(raw) {
   return { blob: await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.86 }), tint: `rgb(${r},${g},${b})` };
 }
 
-// The wallpaper's average colour, made calm for the boxes behind the clock:
-// same hue, saturation cut to at most ~15%, kept dark so light text stays readable.
-function calmTint(rgb) {
-  const [r, g, b] = rgb.match(/\d+/g).map((n) => n / 255);
-  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
-  const s = d ? d / (1 - Math.abs(2 * l - 1)) : 0;
-  let h = 0;
-  if (d) h = (max === r ? (g - b) / d + 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4) % 6;
-  const S = Math.min(s, 0.35) * 0.42, L = 0.1 + l * 0.12;
-  const c = (1 - Math.abs(2 * L - 1)) * S, x = c * (1 - Math.abs((h % 2) - 1)), m = L - c / 2;
-  const [R, G, B] = [[c, x, 0], [x, c, 0], [0, c, x], [0, x, c], [x, 0, c], [c, 0, x]][Math.floor(h)];
-  return [R, G, B].map((v) => Math.round((v + m) * 255)).join(', ');
+// Mean colour of the middle of the image, where the clock sits; it decides the
+// box colour. Averages ~1300 samples (a 1×1 downscale would only sample a few).
+function centreTint(img) {
+  const c = new OffscreenCanvas(48, 27).getContext('2d', { willReadFrequently: true });
+  c.imageSmoothingQuality = 'high';
+  const w = img.naturalWidth, h = img.naturalHeight;
+  c.drawImage(img, w * 0.25, h * 0.2, w * 0.5, h * 0.55, 0, 0, 48, 27);
+  const d = c.getImageData(0, 0, 48, 27).data, sum = [0, 0, 0];
+  for (let i = 0; i < d.length; i += 4) { sum[0] += d[i]; sum[1] += d[i + 1]; sum[2] += d[i + 2]; }
+  return `rgb(${sum.map((v) => Math.round(v / (d.length / 4))).join(',')})`;
 }
 
 async function thumb(blob) {

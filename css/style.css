@@ -21,12 +21,10 @@
   --line: rgba(233, 230, 223, .10);
   --serif: 'Cormorant', 'Cormorant Garamond', Georgia, serif;
   --mono: 'Plex Mono', 'Cascadia Mono', Consolas, monospace;
-  --box-wall: 16, 19, 21;     /* set from the wallpaper by wall.js */
-  --box-rgb: var(--box-wall);
+  --box-rgb: 16, 19, 21;      /* set from the wallpaper, see applyLook in ui.js */
   --shadow: 0 1px 14px rgba(0, 0, 0, .35), 0 0 3px rgba(0, 0, 0, .45);
   color-scheme: dark;
 }
-:root.tint-neutral { --box-rgb: 16, 19, 21; }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
@@ -111,11 +109,17 @@ body.settings-open #veil::after { opacity: .35; }
 /* optional frosted boxes (settings → layout) */
 .boxed {
   background: rgba(var(--box-rgb), var(--box-alpha, .3));
-  transition: background-color .6s ease;
+  transition: background-color .6s ease, color .6s ease;
   border: 1px solid var(--line);
   border-radius: var(--box-radius, 18px);
   -webkit-backdrop-filter: blur(var(--box-blur, 12px));
   backdrop-filter: blur(var(--box-blur, 12px));
+}
+/* light boxes (match / invert on a dark wallpaper) switch to dark ink */
+.box-light .boxed {
+  --fg: #1d2225; --fg-dim: rgba(29, 34, 37, .74); --fg-faint: rgba(29, 34, 37, .52);
+  --sage: #55705a; --line: rgba(0, 0, 0, .08);
+  color: var(--fg); text-shadow: none;
 }
 #clock.boxed { padding: 30px 56px 32px; }
 #time.boxed { padding: 14px 44px 22px; }

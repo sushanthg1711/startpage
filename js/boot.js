@@ -14,6 +14,10 @@ try {
 try {
   const tint = localStorage.getItem('hp.tint');
   if (tint) document.documentElement.style.setProperty('--fallback', tint);
-  const box = localStorage.getItem('hp.box');
-  if (box) document.documentElement.style.setProperty('--box-wall', box);
+  const box = JSON.parse(localStorage.getItem('hp.box'));   // last box colour, see ui.js
+  if (box?.rgb) {
+    document.documentElement.style.setProperty('--box-rgb', box.rgb);
+    document.documentElement.style.setProperty('--box-alpha', box.alpha);
+    if (box.light) document.documentElement.classList.add('box-light');
+  }
 } catch (e) {}
