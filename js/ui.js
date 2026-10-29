@@ -28,6 +28,7 @@ export function applyLook(l) {
   s.setProperty('--box-alpha', l.boxOpacity / 100);
   s.setProperty('--box-radius', `${l.boxRadius}px`);
   s.setProperty('--box-blur', `${l.boxBlur}px`);
+  document.documentElement.classList.toggle('tint-neutral', l.boxTint === 'neutral');
   const box = (sel, on) => $(sel).classList.toggle('boxed', on);
   box('#clock', l.box === 'single');
   box('#time', l.box === 'separate');

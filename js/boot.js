@@ -14,4 +14,6 @@ try {
 try {
   const tint = localStorage.getItem('hp.tint');
   if (tint) document.documentElement.style.setProperty('--fallback', tint);
+  const box = localStorage.getItem('hp.box');
+  if (box) document.documentElement.style.setProperty('--box-wall', box);
 } catch (e) {}

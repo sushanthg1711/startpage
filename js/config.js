@@ -49,6 +49,7 @@ still lake`,
   look: {
     clockShift: -6,          // vh; negative moves the clock and date up
     box: 'single',           // none | single (clock + date together) | separate
+    boxTint: 'wallpaper',    // wallpaper (calm, low-saturation hue from the image) | neutral
     boxOpacity: 30,          // 0–100
     boxRadius: 18,           // px
     boxBlur: 12,             // px of frosted-glass blur behind the box

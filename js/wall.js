@@ -45,7 +45,11 @@ async function show(entry) {
   if (shownUrl) URL.revokeObjectURL(shownUrl);
   shownUrl = url;
 
-  if (entry.tint) try { localStorage.setItem('hp.tint', entry.tint); } catch {}
+  if (entry.tint) {
+    const box = calmTint(entry.tint);
+    document.documentElement.style.setProperty('--box-wall', box);
+    try { localStorage.setItem('hp.tint', entry.tint); localStorage.setItem('hp.box', box); } catch {}
+  }
   const credit = $('#wall-credit');
   credit.textContent = entry.credit || '';
   credit.href = entry.page || '#';
@@ -271,6 +275,20 @@ async function soften(raw) {
   const [r, g, b] = px.getImageData(0, 0, 1, 1).data;
 
   return { blob: await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.86 }), tint: `rgb(${r},${g},${b})` };
+}
+
+// The wallpaper's average colour, made calm for the boxes behind the clock:
+// same hue, saturation cut to at most ~15%, kept dark so light text stays readable.
+function calmTint(rgb) {
+  const [r, g, b] = rgb.match(/\d+/g).map((n) => n / 255);
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
+  const s = d ? d / (1 - Math.abs(2 * l - 1)) : 0;
+  let h = 0;
+  if (d) h = (max === r ? (g - b) / d + 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4) % 6;
+  const S = Math.min(s, 0.35) * 0.42, L = 0.1 + l * 0.12;
+  const c = (1 - Math.abs(2 * L - 1)) * S, x = c * (1 - Math.abs((h % 2) - 1)), m = L - c / 2;
+  const [R, G, B] = [[c, x, 0], [x, c, 0], [0, c, x], [0, x, c], [x, 0, c], [c, 0, x]][Math.floor(h)];
+  return [R, G, B].map((v) => Math.round((v + m) * 255)).join(', ');
 }
 
 async function thumb(blob) {

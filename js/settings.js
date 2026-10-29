@@ -53,6 +53,8 @@ function template() {
   <div class="row"><label>clock height</label><input type="range" min="-20" max="20" step="1" data-k="look.clockShift" data-unit="vh" value="${L().clockShift}"><span class="val">${L().clockShift}vh</span></div>
   <div class="row"><label>clock box</label><select data-k="look.box">
     ${opt('none', L().box)}${opt('single', L().box, 'one box for clock + date')}${opt('separate', L().box, 'separate boxes')}</select></div>
+  <div class="row"><label>box colour</label><select data-k="look.boxTint">
+    ${opt('wallpaper', L().boxTint, 'calm tint from wallpaper')}${opt('neutral', L().boxTint, 'neutral dark')}</select></div>
   <div class="row"><label>box opacity</label><input type="range" min="0" max="100" step="5" data-k="look.boxOpacity" data-unit="%" value="${L().boxOpacity}"><span class="val">${L().boxOpacity}%</span></div>
   <div class="row"><label>corner rounding</label><input type="range" min="0" max="48" step="2" data-k="look.boxRadius" data-unit="px" value="${L().boxRadius}"><span class="val">${L().boxRadius}px</span></div>
   <div class="row"><label>background blur</label><input type="range" min="0" max="30" step="2" data-k="look.boxBlur" data-unit="px" value="${L().boxBlur}"><span class="val">${L().boxBlur}px</span></div>

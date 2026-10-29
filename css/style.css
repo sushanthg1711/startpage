@@ -21,9 +21,12 @@
   --line: rgba(233, 230, 223, .10);
   --serif: 'Cormorant', 'Cormorant Garamond', Georgia, serif;
   --mono: 'Plex Mono', 'Cascadia Mono', Consolas, monospace;
+  --box-wall: 16, 19, 21;     /* set from the wallpaper by wall.js */
+  --box-rgb: var(--box-wall);
   --shadow: 0 1px 14px rgba(0, 0, 0, .35), 0 0 3px rgba(0, 0, 0, .45);
   color-scheme: dark;
 }
+:root.tint-neutral { --box-rgb: 16, 19, 21; }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
@@ -107,7 +110,8 @@ body.settings-open #veil::after { opacity: .35; }
 
 /* optional frosted boxes (settings → layout) */
 .boxed {
-  background: rgba(16, 19, 21, var(--box-alpha, .3));
+  background: rgba(var(--box-rgb), var(--box-alpha, .3));
+  transition: background-color .6s ease;
   border: 1px solid var(--line);
   border-radius: var(--box-radius, 18px);
   -webkit-backdrop-filter: blur(var(--box-blur, 12px));
